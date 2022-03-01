@@ -5,10 +5,8 @@
 int dimension, n;
 double **data_points;
 
+void print_matrix(double **matrix);
 
-int main() {
-    return 0;
-}
 /**
  * 1. check allocation
  * 2.
@@ -125,7 +123,7 @@ double **laplacian_Lnorm() {
     for (i = 0; i < n; ++i) {
         Lnorm_mat[i][i] = 1 - (w_mat[i][i] / diag_mat[i][i]);
         for (j = i + 1; j < n; ++j) {
-            Lnorm_mat[i][j] = w_mat[i][j] / sqrt(diag_mat[i][i] * diag_mat[j][j]);
+            Lnorm_mat[i][j] = - w_mat[i][j] / sqrt(diag_mat[i][i] * diag_mat[j][j]);
             Lnorm_mat[j][i] = Lnorm_mat[i][j];
         }
     }
@@ -151,8 +149,8 @@ void cal_newA(double **new_A, double **A, double c, double s, int max_i, int max
     int r;
     for (r = 0; r < n; ++r) {
         if (r != max_i && r != max_j) {
-            new_A[r][max_i] = c * A[r][max_i] - s * A[r][max_j];
-            new_A[r][max_j] = c * A[r][max_j] + s * A[r][max_i];
+            new_A[r][max_i] = new_A[max_i][r] = c * A[r][max_i] - s * A[r][max_j];
+            new_A[r][max_j] = new_A[max_j][r] =c * A[r][max_j] + s * A[r][max_i];
         }
     }
     new_A[max_i][max_i] = pow(c, 2) * A[max_i][max_i] + pow(s, 2) * A[max_j][max_j] - 2 * s * c * A[max_i][max_j];
@@ -161,13 +159,13 @@ void cal_newA(double **new_A, double **A, double c, double s, int max_i, int max
 }
 
 /** calculate c and s from the Lnorm matrix and returns 0 if it was valid and -1 elsewhere **/
-int set_data(double **Lnorm_mat, double *c, double *s, int *max_i, int *max_j) {
+int set_data(double **A, double *c, double *s, int *max_i, int *max_j) {
     int i, j;
     double max_Aij = 0, theta, t;
     for (i = 0; i < n; ++i) {
         for (j = i + 1; j < n; ++j) {
-            if (fabs(Lnorm_mat[i][j]) > max_Aij) {
-                max_Aij = Lnorm_mat[i][j];
+            if (fabs(A[i][j]) > max_Aij) {
+                max_Aij = fabs(A[i][j]);
                 *max_i = i;
                 *max_j = j;
             }
@@ -176,8 +174,8 @@ int set_data(double **Lnorm_mat, double *c, double *s, int *max_i, int *max_j) {
     if (max_Aij == 0) {
         return -1;
     }
-    theta = (Lnorm_mat[*max_j][*max_j] - Lnorm_mat[*max_i][*max_i]) / (2 * Lnorm_mat[*max_i][*max_j]);
-    t = ((theta >= 0) - (theta < 0)) / (fabs(theta) + sqrt(pow(theta, 2)) + 1);
+    theta = (A[*max_j][*max_j] - A[*max_i][*max_i]) / (2 * A[*max_i][*max_j]);
+    t = ((theta >= 0) - (theta < 0)) / (fabs(theta) + sqrt(pow(theta, 2) + 1));
     *c = 1 / sqrt(pow(t, 2) + 1);
     *s = t * (*c);
     return 0;
@@ -191,6 +189,7 @@ double **jacobi_algo() {
     P = generate_matrix();
     new_A = generate_matrix();
     A = laplacian_Lnorm();
+    copy_matrix(A, new_A);
     set_identity(V);
     do {
         set_identity(P);
@@ -205,12 +204,12 @@ double **jacobi_algo() {
 
         cal_newA(new_A, A, c, s, max_i, max_j);
         cal_eps = get_of_f_A(A) - get_of_f_A(new_A);
-        A = new_A;
+        copy_matrix(new_A, A);
         count++;
     } while (count < max_iter && cal_eps > eps);
 
     result = (double **) calloc(n + 1, sizeof(double *));
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n + 1; ++i) {
         result[i] = (double *) calloc(n, sizeof(double));
     }
     for (j = 0; j < n + 1; ++j) {
@@ -261,7 +260,7 @@ int eigengap_heuristic() {
 }
 
 
-/** print a given matrix
+/** print a given matrix **/
 void print_matrix(double **matrix) {
     int i, j;
     for (i = 0; i < n; ++i) {
@@ -275,4 +274,33 @@ void print_matrix(double **matrix) {
         printf("\n");
     }
 }
-**/
+
+int main() {
+    int count = 1, i, j;
+    n = 3;
+    dimension = 3;
+    data_points = (double **) calloc(n, sizeof(double *));
+    for (i = 0; i < n; ++i) {
+        data_points[i] = (double *) calloc(n, sizeof(double));
+    }
+    for (i = 0; i < 3; ++i) {
+        for (j = 0; j < 3; ++j) {
+            data_points[i][j] = count;
+            count++;
+        }
+    }
+
+    double **d = jacobi_algo();
+//    print_matrix(d);
+    for (i = 0; i < n + 1; ++i) {
+        for (j = 0; j < n; ++j) {
+            if (j != n - 1) {
+                printf("%f , ", d[i][j]);
+            } else {
+                printf("%f ", d[i][j]);
+            }
+        }
+        printf("\n");
+    }
+    return 0;
+}
