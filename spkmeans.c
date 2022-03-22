@@ -8,7 +8,11 @@ void print_matrix(double **matrix, int rows, int cols){
     int i,j;
     for(i=0; i<rows; ++i){
         for (int j = 0; j < cols; ++j) {
-            printf("%f, ", matrix[i][j]);
+            if (j != cols - 1) {
+                printf("%0.4f,", matrix[i][j]);
+            } else {
+                printf("%0.4f ", matrix[i][j]);
+            }
         }
         printf("\n");
     }
@@ -24,13 +28,13 @@ void free_mat(double **matrix, int n) {
 }
 
 /** returns pointer to a matrix that initialized to zeros **/
-double **generate_matrix(int n) {
+double **generate_matrix(int rows, int cols) {
     int i;
     double **matrix;
-    matrix = (double **) calloc(n, sizeof(double *));
+    matrix = (double **) calloc(rows, sizeof(double *));
     check_allocation_2d_array(matrix);
-    for (i = 0; i < n; ++i) {
-        matrix[i] = (double *) calloc(n, sizeof(double));
+    for (i = 0; i < rows; ++i) {
+        matrix[i] = (double *) calloc(cols, sizeof(double));
         check_allocation_array(matrix[i]);
     }
     return matrix;
@@ -61,7 +65,7 @@ void copy_matrix(double **matrix, double **copy_matrix, int n) {
 void multiply(double **V, double **P, int n) {
     int i, j, k;
     double **A;
-    A = generate_matrix(n);
+    A = generate_matrix(n, n);
     for (i = 0; i < n; ++i) {
         for (j = 0; j < n; ++j) {
             for (k = 0; k < n; ++k) {
@@ -86,7 +90,7 @@ double compute_weight(double vec1[], double vec2[], int dimension) {
 /** calculate the weight matrix out of the data points **/
 double **weight_matrix(double **data_points, int n, int dimension) {
     int i, j;
-    double **w_mat = generate_matrix(n);
+    double **w_mat = generate_matrix(n, n);
     for (i = 0; i < n; ++i) {
         w_mat[i][i] = 0;
         for (j = i + 1; j < n; ++j) {
@@ -94,6 +98,8 @@ double **weight_matrix(double **data_points, int n, int dimension) {
             w_mat[j][i] = w_mat[i][j];
         }
     }
+    printf("Weighted Matrix\n");
+    print_matrix(w_mat, n, n);
     return w_mat;
 }
 
@@ -101,7 +107,7 @@ double **weight_matrix(double **data_points, int n, int dimension) {
 double **diagonal_d_matrix(double **data_points, int n, int dimension) {
     double **diag_mat, **w_mat, sum;
     int i, j;
-    diag_mat = generate_matrix(n);
+    diag_mat = generate_matrix(n, n);
     w_mat = weight_matrix(data_points, n, dimension);
     for (i = 0; i < n; ++i) {
         sum = 0;
@@ -110,6 +116,8 @@ double **diagonal_d_matrix(double **data_points, int n, int dimension) {
         }
         diag_mat[i][i] = sum;
     }
+    printf("ddg Matrix\n");
+    print_matrix(diag_mat, n, n);
     return diag_mat;
 }
 
@@ -120,7 +128,7 @@ double **laplacian_Lnorm(double **data_points, int n, int dimension) {
 
     w_mat = weight_matrix(data_points, n, dimension);
     diag_mat = diagonal_d_matrix(data_points, n, dimension);
-    Lnorm_mat = generate_matrix(n);
+    Lnorm_mat = generate_matrix(n, n);
 
     for (i = 0; i < n; ++i) {
         Lnorm_mat[i][i] = 1 - (w_mat[i][i] / diag_mat[i][i]);
@@ -131,6 +139,8 @@ double **laplacian_Lnorm(double **data_points, int n, int dimension) {
     }
     free_mat(diag_mat, n);
     free_mat(w_mat, n);
+    printf("Lnorm Matrix\n");
+    print_matrix(Lnorm_mat, n, n);
     return Lnorm_mat;
 }
 
@@ -184,13 +194,14 @@ int set_data(double **A, double *c, double *s, int *max_i, int *max_j, int n) {
 }
 
 /** Jacobi Algorithm **/
-double **jacobi_algo(double **data_points, int n, int dimension) {
+/** get symmetric matrix and return matrix of eigenvectors, when the first row is the eigenvalues **/
+double **jacobi_algo(double **A, int n) {
     int max_iter = 100, count = 0, max_i, max_j, check, i, j, m;
-    double **P, **V, **A, **new_A, **result, eps = 1.0e-15, cal_eps, c, s;
-    V = generate_matrix(n);
-    P = generate_matrix(n);
-    new_A = generate_matrix(n);
-    A = laplacian_Lnorm(data_points, n, dimension);
+    double **P, **V, **new_A, **result, eps = 1.0e-15, cal_eps, c, s;
+    V = generate_matrix(n, n);
+    P = generate_matrix(n, n);
+    new_A = generate_matrix(n, n);
+//    A = laplacian_Lnorm(data_points, n, dimension);
     copy_matrix(A, new_A, n);
     set_identity(V, n);
     do {
@@ -228,11 +239,16 @@ double **jacobi_algo(double **data_points, int n, int dimension) {
     free_mat(P, n);
     free_mat(V, n);
     free_mat(A, n);
+    printf("Jacobi Matrix\n");
+    print_matrix(result, n,n);
     return result;
 }
 
+
 /** compare between doubles **/
-int compare(const void *obj1, const void *obj2) {
+int compare(const void *p1, const void *p2) {
+    double obj1 = *(double *)p1;
+    double obj2 = *(double *)p2;
     if (obj1 > obj2) {
         return 1;
     }
@@ -246,9 +262,14 @@ int compare(const void *obj1, const void *obj2) {
 int eigengap_heuristic(double **data_points, int n, int dimension) {
     int i, max_i = 0, k;
     double **jacobi_mat, *eigenVals, max_val = 0, delta;
-    jacobi_mat = jacobi_algo(data_points, n, dimension);
+    jacobi_mat = jacobi_algo(data_points, n);
     eigenVals = jacobi_mat[0];
+
     qsort(eigenVals, n, sizeof(double), compare);
+    for (k=0; k<n; k++){
+        printf("%f, ", eigenVals[k]);
+    }
+    printf("\n");
     for (i = 0; i < (int) (n / 2); ++i) {
         delta = fabs(eigenVals[i] - eigenVals[i + 1]);
         if (delta > max_val) {
@@ -278,7 +299,9 @@ double **transpose(double **matrix, int rows, int cols){
 }
 
 /**comparator for qsort - in order to sort vectors**/
-int compare_vec(double *vec1, double *vec2){
+int compare_vec(void *v1, void *v2){
+    double *vec1 = (double *)v1;
+    double *vec2 = (double *)v2;
     if (vec1[0]>vec2[0]){
         return 1;
     }
@@ -331,11 +354,13 @@ double **create_T_matrix(double **matrix, int k, int n){
 
 /** run full spkmeans algorithm. return T matrix, the rest of the algorithm will run from Python**/
 double **sp_kmeans(double **data_points, int n, int dimension, int k) {
-    double **T_matrix, **eigen_mat;
+    double **T_matrix, **eigen_mat, **lnorm_mat;
+    lnorm_mat = laplacian_Lnorm(data_points, n, dimension);
+    eigen_mat = jacobi_algo(lnorm_mat, n);
     if (k==0){
         k = eigengap_heuristic(data_points, n, dimension);
     }
-    eigen_mat = jacobi_algo(data_points, n, dimension);
+
     T_matrix = create_T_matrix(eigen_mat, k, n);
     free_mat(eigen_mat, n+1);
     return T_matrix;
@@ -443,30 +468,29 @@ int main(int argc, char *argv[]) {
     dimension = shape[1];
     free(shape);
     data_points = read_file(file_name, n, dimension);
-    result = generate_matrix(n);
+    result = sp_kmeans(data_points, n, dimension, 4);
+    printf("Result\n");
+    print_matrix(result, n, 4);
+    goal = 10;
     switch (goal) {
         case 1:
             result = weight_matrix(data_points, n, dimension);
+            print_matrix(result, n, n);
             break;
         case 2:
             result = diagonal_d_matrix(data_points, n, dimension);
+            print_matrix(result, n,n);
             break;
         case 3:
             result = laplacian_Lnorm(data_points, n, dimension);
+            print_matrix(result, n, n);
             break;
         case 4:
-            result = jacobi_algo(data_points, n, dimension);
+            result = jacobi_algo(data_points, n);
+            print_matrix(result, n+1, n);
             break;
-    }
-    for(i=0; i<n; ++i){
-        for (int j = 0; j < n; ++j) {
-            if (j != n - 1) {
-                printf("%0.4f, ", result[i][j]);
-            } else {
-                printf("%0.4f ", result[i][j]);
-            }
-        }
-        printf("\n");
+        default:
+            printf("Invalid_Input!");
     }
     return 0;
 }

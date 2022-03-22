@@ -38,6 +38,22 @@ static PyObject *fit(PyObject *self, PyObject *args) {
     return centroids_copy;
 }
 
+
+/* delete func */
+static PyObject *find_k(PyObject *self, PyObject *args){
+    int n, dimension, k;
+    PyObject *data_points_copy;
+    double **data_points;
+    if (!PyArg_ParseTuple(args, "iiO", &n, &dimension, &data_points_copy)) {
+        return NULL;
+    }
+    data_points = transform_PyObject_to_2dArray(data_points_copy, n, dimension);
+    k = eigengap_heuristic(data_points, n, dimension);
+    free_memory(data_points, n);
+    return Py_BuildValue("i", k);
+}
+
+
 static PyObject *spk_ext(PyObject *self, PyObject *args) {
     int k, goal, n, dimension;
     double **data_points, **result;
@@ -45,28 +61,35 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "iiiiO", &k, &goal, &n, &dimension, &data_points_copy)) {
         return NULL;
     }
-    result = initialize_2d_double_array(result, n, n);
+    printf("read Arguments successfully\n");
     data_points = transform_PyObject_to_2dArray(data_points_copy, n, dimension);
     switch (goal) {
         case 1:
             result = sp_kmeans(data_points, n, dimension, k);
+            printf("got spkmeans result in c\n");
+            result_py = transform_2dArray_to_PyObject(result, n ,k);
+            printf("result transformed to PyObject");
             break;
         case 2:
             result = weight_matrix(data_points, n, dimension);
+            result_py = transform_2dArray_to_PyObject(result, n ,n);
             break;
         case 3:
             result = diagonal_d_matrix(data_points, n, dimension);
+            result_py = transform_2dArray_to_PyObject(result, n ,n);
             break;
         case 4:
             result = laplacian_Lnorm(data_points, n, dimension);
+            result_py = transform_2dArray_to_PyObject(result, n ,n);
             break;
         case 5:
-            result = jacobi_algo(data_points, n, dimension);
+            result = jacobi_algo(data_points, n);
+            result_py = transform_2dArray_to_PyObject(result, n ,n);
             break;
     }
-    result_py = transform_2dArray_to_PyObject(result, n ,n);
-    free_memory(result, n);
-    free_memory(data_points,n);
+//    free_memory(result, n);
+//    free_memory(data_points,n);
+    printf("got to the end\n");
     return result_py;
 }
 
@@ -99,24 +122,25 @@ PyObject *transform_2dArray_to_PyObject(double **mat, int rows, int columns) {
     return new_mat;
 }
 
-static PyMethodDef spkmeansmodule_func[] = {
+static PyMethodDef mykmeanssp_func[] = {
         {"fit", (PyCFunction) fit, METH_VARARGS, NULL},
         {"spk_ext", (PyCFunction) spk_ext, METH_VARARGS, NULL},
+        {"find_k", (PyCFunction) find_k, METH_VARARGS, NULL},
         {NULL, NULL, 0,                          NULL}
 };
 
-static struct PyModuleDef spkmeansmodule = {
+static struct PyModuleDef mykmeanssp = {
         PyModuleDef_HEAD_INIT,
-        "spkmeansmodule",
+        "mykmeanssp",
         NULL,
         -1,
-        spkmeansmodule_func
+        mykmeanssp_func
 };
 
 PyMODINIT_FUNC
-PyInit_spkmeansmodule(void) {
+PyInit_mykmeanssp(void) {
     PyObject *m;
-    m = PyModule_Create(&spkmeansmodule);
+    m = PyModule_Create(&mykmeanssp);
     if (!m)
         return NULL;
     return m;

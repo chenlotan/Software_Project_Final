@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages, Extension
 
 setup(
-    name='spkmeansmodule',
+    name='mykmeanssp',
     packages=find_packages(),
     ext_modules=[
         Extension(
-            'spkmeansmodule',
+            'mykmeanssp',
             ['spkmeansmodule.c', 'kmeans.c', 'spkmeans.c']
         )
     ]

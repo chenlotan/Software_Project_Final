@@ -17,7 +17,7 @@
 import numpy as np
 import pandas as pd
 import sys
-import spkmeansmodule
+import mykmeanssp
 
 def validate(condition):
     if not condition:
@@ -56,23 +56,28 @@ def initialize_centroids(vectors, k):
     return mu_index.astype(int), mu.astype(float)
 
 
+goals = {"spk": 1, "wam": 2, "ddg": 3, "lnorm": 4, "jacobi": 5}
 args = sys.argv[1:]
 validate(len(args) == 3)
 k, goal, input_filename = args[0], args[1], args[2]
 validate(args[0].isdigit())
-validate(args[1].isdigit())
 k = int(k)
-goal = int(goal)
+goal = goals[goal]
 epsilon = 0
 max_iter = 300
 vectors = read_file_to_df(input_filename)
-result = spkmeansmodule.spk_ext(k, goal, vectors.shape[0], vectors.shape[1], vectors.to_numpy().tolist())
-if k==0:
-    k = len(result[0])
+n = vectors.shape[0]
+dimension = vectors.shape[1]
+# validate((k < n) & (k != 1))
+result = mykmeanssp.spk_ext(k, goal, n, dimension, vectors.to_numpy().tolist())
+
 
 if goal == 1:
+    if k == 0:
+        k = len(result[0])
+        print("k =", k)
     centroids_index, centroids = initialize_centroids(result, k)
-    final_centroids = spkmeansmodule.fit(k, len(result[0]), len(result), max_iter, epsilon, centroids.tolist(), result)
+    final_centroids = mykmeanssp.fit(k, n, n, max_iter, epsilon, centroids.tolist(), result)
     for i in range(len(centroids_index)):
         if i < len(centroids_index) - 1:
             print(str(centroids_index[i]) + ",", end="")
