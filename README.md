@@ -5,15 +5,14 @@ changes made:
 * the heuristic eigenvalues function was changed, some functions were added to sort the eigen. 
 * the code for the module extension was written - build and import suppose to run (with the setup file)
 * main function for the C code was added
+* supporting csv and txt files in C is made in the same way - our code suppose to work for both of them
 * etc
 
 To do:
 spkmeans.c:
-1. need to add support in CSV files
-2. spk not working - inaccurate numbers in Jacobi Algorithm and heuristic eigenvalues - !!! if k=1 in the end of this algorithm Error of type 2!!!
-3. need to add validation that the matrix we get for Jacobi Algorithm is symmetric (?)
-4. need to verify if the creation of matrix T is right
-5. need to write comp.sh file
+1. spk not working - inaccurate numbers in Jacobi Algorithm and heuristic eigenvalues - !!! if k=1 in the end of this algorithm Error of type 2!!!
+2. need to add validation that the matrix we get for Jacobi Algorithm is symmetric (?)
+3. need to write comp.sh file
 
 ------------------------------
 example for Jacobi matrix:
