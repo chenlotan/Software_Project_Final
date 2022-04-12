@@ -196,7 +196,6 @@ double **jacobi_algo(double **A, int n) {
     V = generate_matrix(n, n);
     P = generate_matrix(n, n);
     new_A = generate_matrix(n, n);
-//    A = laplacian_Lnorm(data_points, n, dimension);
     copy_matrix(A, new_A, n);
     set_identity(V, n);
     do {
