@@ -1,7 +1,6 @@
 #include <math.h>
 #include "kmeans.h"
 
-//int dimension, k, N;
 
 double compute_distance(double vec1[], double vec2[], int dimension) {
     double sum = 0;
