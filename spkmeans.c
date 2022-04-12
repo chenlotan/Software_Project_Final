@@ -4,11 +4,10 @@ int check_allocation_array(const double *p);
 
 int check_allocation_2d_array(const double **p);
 
-
 void print_matrix(double **matrix, int rows, int cols){
     int i,j;
     for(i=0; i<rows; ++i){
-        for (int j = 0; j < cols; ++j) {
+        for (j = 0; j < cols; ++j) {
             if (j != cols - 1) {
                 printf("%0.4f,", matrix[i][j]);
             } else {
