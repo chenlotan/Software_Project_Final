@@ -56,6 +56,20 @@ def initialize_centroids(vectors, k):
     return mu_index.astype(int), mu.astype(float)
 
 
+def fix_jacobi_eigenVals(matrix):
+    for j in range(len(matrix[0])):
+        if matrix[0][i] == 0:
+            matrix[0][i] = 0.0000
+
+
+def print_matrix(matrix):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if j < len(matrix[0]) - 1:
+                print(str("{0:.4f}".format(matrix[i][j])) + ",", end="")
+            else:
+                print(str("{0:.4f}".format(matrix[i][j])))
+
 goals = {"spk": 1, "wam": 2, "ddg": 3, "lnorm": 4, "jacobi": 5}
 args = sys.argv[1:]
 validate(len(args) == 3)
@@ -71,32 +85,32 @@ dimension = vectors.shape[1]
 # validate((k < n) & (k != 1))
 result = mykmeanssp.spk_ext(k, goal, n, dimension, vectors.to_numpy().tolist())
 
+if goal == 5:
+    fix_jacobi_eigenVals(result)
 
 if goal == 1:
     if k == 0:
         k = len(result[0])
         print("k =", k)
     centroids_index, centroids = initialize_centroids(result, k)
-    final_centroids = mykmeanssp.fit(k, n, n, max_iter, epsilon, centroids.tolist(), result)
+    final_centroids = mykmeanssp.fit(k, k, n, max_iter, epsilon, centroids.tolist(), result)
     for i in range(len(centroids_index)):
         if i < len(centroids_index) - 1:
             print(str(centroids_index[i]) + ",", end="")
         else:
             print(str(centroids_index[i]))
-    for i in range(len(final_centroids)):
-        for j in range(len(final_centroids[0])):
-            if j < len(final_centroids[0]) - 1:
-                print(str("{0:.4f}".format(final_centroids[i][j])) + ",", end="")
-            else:
-                print(str("{0:.4f}".format(final_centroids[i][j])))
+    print(final_centroids)
+    print_matrix(final_centroids)
+
+    # for i in range(len(final_centroids)):
+    #     for j in range(len(final_centroids[0])):
+    #         if j < len(final_centroids[0]) - 1:
+    #             print(str("{0:.4f}".format(final_centroids[i][j])) + ",", end="")
+    #         else:
+    #             print(str("{0:.4f}".format(final_centroids[i][j])))
+
 
 else:
-    for i in range(len(result)):
-        for j in range(len(result[0])):
-            if j < len(result[0]) - 1:
-                print(str("{0:.4f}".format(result[i][j])) + ",", end="")
-            else:
-                print(str("{0:.4f}".format(result[i][j])))
-
+    print_matrix(result)
 
 
