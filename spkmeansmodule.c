@@ -112,6 +112,9 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
             free_memory(result, n);
             free_memory(data_points,n);
             break;
+        default:
+            printf("Invalid Input!");
+            exit(1);
     }
 
     return result_py;

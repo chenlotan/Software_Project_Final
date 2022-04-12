@@ -1,8 +1,8 @@
 #include "spkmeans.h"
 
-int check_allocation_array(const double *p);
+int check_allocation_array(double *p);
 
-int check_allocation_2d_array(const double **p);
+int check_allocation_2d_array(double **p);
 
 void print_matrix(double **matrix, int rows, int cols){
     int i,j;
@@ -318,7 +318,7 @@ double **create_T_matrix(double **matrix, int k, int n){
     return result;
 }
 
-int check_allocation_array(const double *p) {
+int check_allocation_array(double *p) {
     if (p == NULL) {
         printf("An Error Has Occurred");
         exit(1);
@@ -326,7 +326,7 @@ int check_allocation_array(const double *p) {
     return 0;
 }
 
-int check_allocation_2d_array(const double **p){
+int check_allocation_2d_array(double **p){
     if (p == NULL) {
         printf("An Error Has Occurred");
         exit(1);
