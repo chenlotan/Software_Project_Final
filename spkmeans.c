@@ -1,8 +1,10 @@
 #include "spkmeans.h"
 
-int check_allocation_array(double *p);
+int check_allocation_double_array(double *p);
 
 int check_allocation_2d_array(double **p);
+
+int check_allocation_int_array(int *p);
 
 void print_matrix(double **matrix, int rows, int cols){
     int i,j;
@@ -35,7 +37,7 @@ double **generate_matrix(int rows, int cols) {
     check_allocation_2d_array(matrix);
     for (i = 0; i < rows; ++i) {
         matrix[i] = (double *) calloc(cols, sizeof(double));
-        check_allocation_array(matrix[i]);
+        check_allocation_double_array(matrix[i]);
     }
     return matrix;
 }
@@ -218,7 +220,7 @@ double **jacobi_algo(double **A, int n) {
     check_allocation_2d_array(result);
     for (i = 0; i < n + 1; ++i) {
         result[i] = (double *) calloc(n, sizeof(double));
-        check_allocation_array(result[i]);
+        check_allocation_double_array(result[i]);
     }
     for (j = 0; j < n + 1; ++j) {
         for (m = 0; m < n; ++m) {
@@ -255,7 +257,7 @@ double **transpose(double **matrix, int rows, int cols){
     check_allocation_2d_array(result);
     for(i=0; i<cols; i++){
         result[i] = (double *) calloc(sizeof (double ), rows);
-        check_allocation_array(result[i]);
+        check_allocation_double_array(result[i]);
         for (j=0; j<rows; j++){
             result[i][j] = matrix[j][i];
         }
@@ -291,7 +293,7 @@ double **k_min_eigenvectors(double **matrix, int k, int n){
     double **result = (double **) malloc(sizeof (double *)*n);
     for(i=0; i<n; i++){
         result[i] = (double *) calloc(k, sizeof(double));
-        check_allocation_array(result[i]);
+        check_allocation_double_array(result[i]);
         for(j=0; j<k; j++){
             result[i][j] = matrix[j][i+1];
         }
@@ -318,7 +320,15 @@ double **create_T_matrix(double **matrix, int k, int n){
     return result;
 }
 
-int check_allocation_array(double *p) {
+int check_allocation_double_array(double *p) {
+    if (p == NULL) {
+        printf("An Error Has Occurred");
+        exit(1);
+    }
+    return 0;
+}
+
+int check_allocation_int_array(int *p) {
     if (p == NULL) {
         printf("An Error Has Occurred");
         exit(1);
@@ -352,7 +362,7 @@ int *find_shape(char *fileName){
     char buff[1024];
     int ch, n = 0;
     int *res = (int *)calloc(2,sizeof(int));
-    check_allocation_array(res);
+    check_allocation_int_array(res);
     if (file){
         ch = fscanf(file, "%s", buff);
         while((ch != 'n') && (ch != EOF)){
@@ -385,7 +395,7 @@ double **read_file(char fileName[], int n, int dimension) {
         ch = fscanf(file, "%s", buff);
         while ((ch != '\n') && (ch != EOF)) {
             vector = (double *) (malloc(dimension * sizeof(double)));
-            check_allocation_array(vector);
+            check_allocation_double_array(vector);
             place = vector;
             ptr = strtok(buff, ",");
             while (ptr != NULL) {
