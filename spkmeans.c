@@ -99,8 +99,6 @@ double **weight_matrix(double **data_points, int n, int dimension) {
             w_mat[j][i] = w_mat[i][j];
         }
     }
-//    printf("Weighted Matrix\n");
-//    print_matrix(w_mat, n, n);
     return w_mat;
 }
 
@@ -117,8 +115,6 @@ double **diagonal_d_matrix(double **data_points, int n, int dimension) {
         }
         diag_mat[i][i] = sum;
     }
-//    printf("ddg Matrix\n");
-//    print_matrix(diag_mat, n, n);
     return diag_mat;
 }
 
@@ -140,8 +136,6 @@ double **laplacian_Lnorm(double **data_points, int n, int dimension) {
     }
     free_mat(diag_mat, n);
     free_mat(w_mat, n);
-//    printf("Lnorm Matrix\n");
-//    print_matrix(Lnorm_mat, n, n);
     return Lnorm_mat;
 }
 
@@ -195,7 +189,6 @@ int set_data(double **A, double *c, double *s, int *max_i, int *max_j, int n) {
 }
 
 /** Jacobi Algorithm **/
-/** get symmetric matrix and return matrix of eigenvectors, when the first row is the eigenvalues **/
 double **jacobi_algo(double **A, int n) {
     int max_iter = 100, count = 0, max_i, max_j, check, i, j, m;
     double **P, **V, **new_A, **result, eps = 1.0e-15, cal_eps, c, s;
@@ -239,25 +232,7 @@ double **jacobi_algo(double **A, int n) {
     }
     free_mat(P, n);
     free_mat(V, n);
-//    free_mat(A, n);
-//    printf("Jacobi Matrix\n");
-//    print_matrix(result, n+1,n);
     return result;
-}
-
-
-
-/** compare between doubles **/
-int compare(const void *p1, const void *p2) {
-    double obj1 = *(double *)p1;
-    double obj2 = *(double *)p2;
-    if (obj1 > obj2) {
-        return 1;
-    }
-    if (obj1 < obj2) {
-        return -1;
-    }
-    return 0;
 }
 
 /** calculate k (number of clusters) out of the eigengap **/
@@ -304,7 +279,6 @@ int compare_vec(const void *v1, const void *v2){
 
 /**transpose matrix and sort - return value is vector of the sorted eigenvalues**/
 double* transpose_and_sort(double **jacobi_mat, int n){
-    int i;
     double **transposed, *eigen_vals;
     transposed = transpose(jacobi_mat, n+1, n);
     qsort(transposed, n, sizeof(double *), compare_vec);
@@ -345,9 +319,6 @@ double **create_T_matrix(double **matrix, int k, int n){
     return result;
 }
 
-
-
-/** run full spkmeans algorithm. return T matrix, the rest of the algorithm will run from Python**/
 int check_allocation_array(const double *p) {
     if (p == NULL) {
         printf("An Error Has Occurred");
@@ -383,38 +354,25 @@ int *find_shape(char *fileName){
     int ch, n = 0;
     int *res = (int *)calloc(2,sizeof(int));
     check_allocation_array(res);
-    ch = fscanf(file, "%s", buff);
-    while((ch != 'n') && (ch != EOF)){
-        if (n == 0){
-            res[1] = find_dimension(buff);
-        }
-        n++;
+    if (file){
         ch = fscanf(file, "%s", buff);
+        while((ch != 'n') && (ch != EOF)){
+            if (n == 0){
+                res[1] = find_dimension(buff);
+            }
+            n++;
+            ch = fscanf(file, "%s", buff);
+        }
+        fclose(file);
+        res[0] = n;
+        return res;
     }
-    fclose(file);
-    res[0] = n;
-    return res;
+    else {
+        printf("Invalid Input!");
+        exit(1);
+    }
 }
 
-
-/** find the right delim needed according to the file type **/
-const char *find_right_delim(FILE *file){
-    FILE *f = file;
-    char c = getc(f);
-    while ((c != '\n') && (c != EOF)){
-        if (c == ','){
-            return ",";
-        }
-        else if (c == ';'){
-            return ";";
-        }
-        else printf("Invalid Delim");
-        c = getc(f);
-    }
-
-}
-
-/***********************************handles only txt need to add support for csv files**********************************************/
 /**read file and create vectors list**/
 double **read_file(char fileName[], int n, int dimension) {
     FILE *file = fopen(fileName, "r");
@@ -449,28 +407,6 @@ double **read_file(char fileName[], int n, int dimension) {
 
 }
 
-
-//double **sp_kmeans(double **data_points, int n, int dimension, int k) {
-//    double **T_matrix, **eigen_mat, **lnorm_mat;
-//    lnorm_mat = laplacian_Lnorm(data_points, n, dimension);
-//    printf("lnorm matrix was created\n");
-//    eigen_mat = jacobi_algo(lnorm_mat, n);
-//    printf("eigen matrix was created\n");
-//    if (k==0){
-//        k = eigengap_heuristic(eigen_mat, n);
-//        printf("C spkmeans k =%d\n", k);
-//    }
-//    T_matrix = create_T_matrix(eigen_mat, k, n);
-//    printf("T matrix was created\n");
-//    free_mat(lnorm_mat, n);
-//    printf("free memory lnorm matrix\n");
-//    free_mat(eigen_mat, n+1);
-//    printf("free memory eigen mat\n");
-//
-//    printf("C T_matrix\n");
-//    print_matrix(T_matrix, n, k);
-//    return T_matrix;
-//}
 
 int main(int argc, char *argv[]) {
     int goal, dimension, n, i, j;
