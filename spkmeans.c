@@ -408,9 +408,9 @@ double **read_file(char fileName[], int n, int dimension) {
 
 
 int main(int argc, char *argv[]) {
-    int goal, dimension, n, i, j;
+    int dimension, n;
     int *shape;
-    char *file_name;
+    char *file_name, *goal;
     double **data_points, **result;
     if (argc != 3){
         printf("Invalid Input!");

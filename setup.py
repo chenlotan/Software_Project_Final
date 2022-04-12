@@ -6,7 +6,7 @@ setup(
     ext_modules=[
         Extension(
             'mykmeanssp',
-            ['spkmeansmodule.c', 'kmeans.c', 'spkmeans.c']
+            ['spkmeansmodule.c', 'kmeans.h','kmeans.c', 'spkmeans.h', 'spkmeans.c']
         )
     ]
 )
