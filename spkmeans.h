@@ -1,6 +1,4 @@
-//
-// Created by chen on 3/12/2022.
-//
+
 
 #ifndef SOFTWARE_PROJECT_FINAL_SPKMEANS_H
 #define SOFTWARE_PROJECT_FINAL_SPKMEANS_H
@@ -21,4 +19,4 @@ double **create_T_matrix(double **matrix, int k, int n);
 double *get_eigenVals(double **matrix, int n);
 double **transpose(double **matrix, int rows, int cols);
 
-#endif //SOFTWARE_PROJECT_FINAL_SPKMEANS_H
+#endif /*SOFTWARE_PROJECT_FINAL_SPKMEANS_H*/
