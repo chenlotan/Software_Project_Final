@@ -75,8 +75,8 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
             /*printf("lnorm Mat\n");
             print_matrix(lnorm_mat, n, n);*/
             eigen_mat = jacobi_algo(lnorm_mat, n);
-            /*printf("Jacobi Mat\n");
-            print_matrix(eigen_mat, n+1, n);*/
+//            printf("Jacobi Mat\n");
+//            print_matrix(eigen_mat, n+1, n);
             transposed_eigenMat = transpose_and_sort(eigen_mat, n);
             eigen_vals = get_eigenVals(transposed_eigenMat, n);
             if (k==0){
@@ -87,18 +87,18 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
                 }
             }
             sorted_eigenMat = transpose(transposed_eigenMat, n, n+1);
-            /*printf("Sorted eigenVal\n");
-            print_matrix(sorted_eigenMat, n+1, n);*/
+//            printf("Sorted eigenVal\n");
+//            print_matrix(sorted_eigenMat, n+1, n);
             result = create_T_matrix(sorted_eigenMat, k, n);
-            /*printf("T matix\n");
-            print_matrix(result, n, k);*/
+//            printf("T matrix\n");
+//            print_matrix(result, n, k);
             result_py = transform_2dArray_to_PyObject(result, n ,k);
+            free_memory(data_points,n);
             free(eigen_vals);
             free_memory(lnorm_mat, n);
             free_memory(eigen_mat, n+1);
             free_memory(sorted_eigenMat, n);
             free_memory(result, k);
-            free_memory(data_points,n);
             break;
         case 2:
             result = weight_matrix(data_points, n, dimension);

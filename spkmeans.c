@@ -192,7 +192,7 @@ int set_data(double **A, double *c, double *s, int *max_i, int *max_j, int n) {
 /** Jacobi Algorithm **/
 double **jacobi_algo(double **A, int n) {
     int max_iter = 100, count = 0, max_i, max_j, check, i, j, m;
-    double **P, **V, **new_A, **result, eps = 1.0e-15, cal_eps, c, s;
+    double **P, **V, **new_A, **result, eps = 1.0e-5, cal_eps, c, s;
     V = generate_matrix(n, n);
     P = generate_matrix(n, n);
     new_A = generate_matrix(n, n);
@@ -299,19 +299,6 @@ double *get_eigenVals(double **matrix, int n){
     return eigen_vals;
 }
 
-/**create matrix from eigenvectors of k minimal eigenvalues**/
-double **k_min_eigenvectors(double **matrix, int k, int n){
-    int i, j;
-    double **result = (double **) malloc(sizeof (double *)*n);
-    for(i=0; i<n; i++){
-        result[i] = (double *) calloc(k, sizeof(double));
-        check_allocation_double_array(result[i]);
-        for(j=0; j<k; j++){
-            result[i][j] = matrix[i+1][j];
-        }
-    }
-    return result;
-}
 
 /**create T matrix - vectors of k min eigenvalues normalized
  * in case of row of zeros - the row will stay the same**/
@@ -431,31 +418,10 @@ double **read_file(char fileName[], int n, int dimension) {
 
 }
 
-/*
-double **sp_kmeans(double **data_points, int n, int dimension, int k) {
-    double **T_matrix, **eigen_mat, **lnorm_mat, *eigen_vals, **transposed, **eigenMat_sorted;
-    lnorm_mat = laplacian_Lnorm(data_points, n, dimension);
-    eigen_mat = jacobi_algo(lnorm_mat, n);
-    printf("Jacobi Matrix\n");
-    print_matrix(eigen_mat, n+1, n);
-    transposed = transpose_and_sort(eigen_mat, n);
-    eigen_vals = get_eigenVals(transposed, n);
-    if (k==0){
-        k = eigengap_heuristic(eigen_vals, n);
-    }
-    eigenMat_sorted = transpose(transposed, n, n+1);
-    printf("Sorted eigenMat\n");
-    print_matrix(eigen_mat, n+1, n);
-    T_matrix = create_T_matrix(eigenMat_sorted, k, n);
-    printf("T matrix\n");
-    print_matrix(T_matrix, n, k);
-    free_mat(eigen_mat, n+1);
-    free_mat(transposed, n);
-    return T_matrix;
-}*/
+
 
 int main(int argc, char *argv[]) {
-    int dimension, n;
+    int dimension, n, i;
     int *shape;
     char *file_name, *goal;
     double **data_points, **result;

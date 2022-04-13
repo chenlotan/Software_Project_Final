@@ -46,7 +46,6 @@ def initialize_centroids(vectors, k):
     mu_index = np.zeros(k)
     np.random.seed(0)
     N = len(vectors)
-    # print(vectors.shape[1])
     mu_index[0] = np.random.choice(N)
     mu[0] = vectors[(int(mu_index[0]))]
     for i in range(1, k):
@@ -55,7 +54,6 @@ def initialize_centroids(vectors, k):
         mu_index[i] = np.random.choice(N, p=p)
         mu[i] = vectors[int(mu_index[i])]
     return mu_index.astype(int), mu.astype(float)
-
 
 
 def print_matrix(matrix):
@@ -96,5 +94,3 @@ if goal == 1:
 
 else:
     print_matrix(result)
-
-
