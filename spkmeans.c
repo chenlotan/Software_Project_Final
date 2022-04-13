@@ -284,8 +284,7 @@ int compare_vec(const void *v1, const void *v2){
 
 /**transpose matrix and sort - return value is vector of the sorted eigenvalues**/
 double** transpose_and_sort(double **jacobi_mat, int n){
-    double **transposed, *eigen_vals;
-    int i;
+    double **transposed;
     transposed = transpose(jacobi_mat, n+1, n);
     qsort(transposed, n, sizeof(double *), compare_vec);
     return transposed;
