@@ -50,7 +50,7 @@ static PyObject *fit(PyObject *self, PyObject *args) {
                 final_centroids[j][q] = 0;
             }
         }
-        if (curr_eps < 0.000001) {
+        if (curr_eps < eps) {
             break;
         }
     }
@@ -63,7 +63,7 @@ static PyObject *fit(PyObject *self, PyObject *args) {
 
 static PyObject *spk_ext(PyObject *self, PyObject *args) {
     int k, goal, n, dimension;
-    double **data_points, **result, **eigen_mat, **lnorm_mat, *eigen_vals;
+    double **data_points, **result, **eigen_mat, **lnorm_mat, **sorted_eigenMat, *eigen_vals, **transposed_eigenMat;
     PyObject *data_points_copy, *result_py;
     if (!PyArg_ParseTuple(args, "iiiiO", &k, &goal, &n, &dimension, &data_points_copy)) {
         return NULL;
@@ -72,19 +72,31 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
     switch (goal) {
         case 1:
             lnorm_mat = laplacian_Lnorm(data_points, n, dimension);
+            /*printf("lnorm Mat\n");
+            print_matrix(lnorm_mat, n, n);*/
             eigen_mat = jacobi_algo(lnorm_mat, n);
-            eigen_vals = transpose_and_sort(eigen_mat, n);
+            /*printf("Jacobi Mat\n");
+            print_matrix(eigen_mat, n+1, n);*/
+            transposed_eigenMat = transpose_and_sort(eigen_mat, n);
+            eigen_vals = get_eigenVals(transposed_eigenMat, n);
             if (k==0){
                 k = eigengap_heuristic(eigen_vals, n);
-//                if (k==1){
-//                    printf("An Error Has Occurred");
-//                    exit(1);
-//                }
+                if (k==1){
+                    printf("An Error Has Occurred\n");
+                    exit(1);
+                }
             }
-            result = create_T_matrix(eigen_mat, k, n);
+            sorted_eigenMat = transpose(transposed_eigenMat, n, n+1);
+            /*printf("Sorted eigenVal\n");
+            print_matrix(sorted_eigenMat, n+1, n);*/
+            result = create_T_matrix(sorted_eigenMat, k, n);
+            /*printf("T matix\n");
+            print_matrix(result, n, k);*/
             result_py = transform_2dArray_to_PyObject(result, n ,k);
+            free(eigen_vals);
             free_memory(lnorm_mat, n);
             free_memory(eigen_mat, n+1);
+            free_memory(sorted_eigenMat, n);
             free_memory(result, k);
             free_memory(data_points,n);
             break;
@@ -108,12 +120,12 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
             break;
         case 5:
             result = jacobi_algo(data_points, n);
-            result_py = transform_2dArray_to_PyObject(result, n ,n);
-            free_memory(result, n);
+            result_py = transform_2dArray_to_PyObject(result, n+1 ,n);
+            free_memory(result, n+1);
             free_memory(data_points,n);
             break;
         default:
-            printf("Invalid Input!");
+            printf("Invalid Input!\n");
             exit(1);
     }
 

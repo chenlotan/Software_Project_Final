@@ -24,11 +24,18 @@ double **initialize_2d_double_array(double **arr, int d1, int d2) {
 int calc_argmin(double *mu[], double *vector, int k, int dimension) {
     double min_val = HUGE_VAL, sum_p;
     int min_mu = 0, i;
+    /*printf("vector \n");
+    for (i=0; i<dimension; ++i){
+        printf("%f ,", vector[i]);
+    }*/
+
     for (i = 0; i < k; ++i) {
         sum_p = compute_distance(mu[i], vector, dimension);
-        if (sum_p < min_val) {
+        if (sum_p < min_val - 0.000001) {
             min_val = sum_p;
             min_mu = i;
+            /*printf("i = %d, minVal = %f , sump = %f \n", i, min_val, sum_p);*/
+
         }
     }
     return min_mu;
@@ -41,6 +48,7 @@ void reset_clusters(double **vectors_list, double *mu[], double *new_sum[], int 
     count = calloc(k, sizeof(int));
 
     for (t = 0; t < N; t++) {
+
         min_mu = calc_argmin(mu, vectors_list[t], k, dimension);
         count[min_mu]++;
         vec = vectors_list[t];
@@ -48,6 +56,13 @@ void reset_clusters(double **vectors_list, double *mu[], double *new_sum[], int 
             new_sum[min_mu][j] += *vec;
             vec++;
         }
+        /*printf("new_sum\n");
+        for (int i=0; i<k; ++i){
+            for (j=0; j<dimension; ++j){
+                printf("%f, ", new_sum[i][j]);
+            }
+            printf("\n");
+        }*/
     }
     for (r = 0; r < k; ++r) {
         if (count[r] == 0) {

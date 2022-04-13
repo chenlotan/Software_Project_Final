@@ -224,7 +224,12 @@ double **jacobi_algo(double **A, int n) {
     for (j = 0; j < n + 1; ++j) {
         for (m = 0; m < n; ++m) {
             if (j == 0) {
-                result[j][m] = A[m][m];
+                if (-0.00001 < A[m][m] && A[m][m] < 0){
+                    result[j][m] = -A[m][m];
+                }
+                else {
+                    result[j][m] = A[m][m];
+                }
             } else {
                 result[j][m] = V[j - 1][m];
             }
@@ -278,11 +283,20 @@ int compare_vec(const void *v1, const void *v2){
 }
 
 /**transpose matrix and sort - return value is vector of the sorted eigenvalues**/
-double* transpose_and_sort(double **jacobi_mat, int n){
+double** transpose_and_sort(double **jacobi_mat, int n){
     double **transposed, *eigen_vals;
+    int i;
     transposed = transpose(jacobi_mat, n+1, n);
     qsort(transposed, n, sizeof(double *), compare_vec);
-    eigen_vals = (double *) calloc(n, sizeof (double));
+    return transposed;
+}
+
+double *get_eigenVals(double **matrix, int n){
+    int i;
+    double *eigen_vals = (double *) calloc(n, sizeof (double));
+    for (i = 0; i<n; i++){
+        eigen_vals[i] = matrix[i][0];
+    }
     return eigen_vals;
 }
 
@@ -294,7 +308,7 @@ double **k_min_eigenvectors(double **matrix, int k, int n){
         result[i] = (double *) calloc(k, sizeof(double));
         check_allocation_double_array(result[i]);
         for(j=0; j<k; j++){
-            result[i][j] = matrix[j][i+1];
+            result[i][j] = matrix[i+1][j];
         }
     }
     return result;
@@ -303,16 +317,19 @@ double **k_min_eigenvectors(double **matrix, int k, int n){
 /**create T matrix - vectors of k min eigenvalues normalized
  * in case of row of zeros - the row will stay the same**/
 double **create_T_matrix(double **matrix, int k, int n){
-    int i, j, sum_row;
-    double  **result = k_min_eigenvectors(matrix, k, n);
+    int i, j;
+    double sum_row;
+    double **result;
+    result = (double **) malloc(n*sizeof(double *));
     for(i=0; i<n; i++){
+        result[i] = (double *) calloc(k, sizeof(double ));
         sum_row=0;
         for(j=0; j<k; j++){
-            sum_row += pow(matrix[i][j], 2);
+            sum_row += pow(matrix[i+1][j], 2);
         }
         for(j=0; j<k; j++){
             if (sum_row != 0){
-                result[i][j] = result[i][j]/(sqrt(sum_row));
+                result[i][j] = matrix[i+1][j]/(sqrt(sum_row));
             }
         }
     }
@@ -321,7 +338,7 @@ double **create_T_matrix(double **matrix, int k, int n){
 
 int check_allocation_double_array(double *p) {
     if (p == NULL) {
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         exit(1);
     }
     return 0;
@@ -329,7 +346,7 @@ int check_allocation_double_array(double *p) {
 
 int check_allocation_int_array(int *p) {
     if (p == NULL) {
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         exit(1);
     }
     return 0;
@@ -337,7 +354,7 @@ int check_allocation_int_array(int *p) {
 
 int check_allocation_2d_array(double **p){
     if (p == NULL) {
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         exit(1);
     }
     return 0;
@@ -376,7 +393,7 @@ int *find_shape(char *fileName){
         return res;
     }
     else {
-        printf("Invalid Input!");
+        printf("Invalid Input!\n");
         exit(1);
     }
 }
@@ -409,12 +426,34 @@ double **read_file(char fileName[], int n, int dimension) {
         fclose(file);
         return all_vectors;
     } else {
-        printf("Invalid Input!");
+        printf("Invalid Input!\n");
         exit(1);
     }
 
 }
 
+/*
+double **sp_kmeans(double **data_points, int n, int dimension, int k) {
+    double **T_matrix, **eigen_mat, **lnorm_mat, *eigen_vals, **transposed, **eigenMat_sorted;
+    lnorm_mat = laplacian_Lnorm(data_points, n, dimension);
+    eigen_mat = jacobi_algo(lnorm_mat, n);
+    printf("Jacobi Matrix\n");
+    print_matrix(eigen_mat, n+1, n);
+    transposed = transpose_and_sort(eigen_mat, n);
+    eigen_vals = get_eigenVals(transposed, n);
+    if (k==0){
+        k = eigengap_heuristic(eigen_vals, n);
+    }
+    eigenMat_sorted = transpose(transposed, n, n+1);
+    printf("Sorted eigenMat\n");
+    print_matrix(eigen_mat, n+1, n);
+    T_matrix = create_T_matrix(eigenMat_sorted, k, n);
+    printf("T matrix\n");
+    print_matrix(T_matrix, n, k);
+    free_mat(eigen_mat, n+1);
+    free_mat(transposed, n);
+    return T_matrix;
+}*/
 
 int main(int argc, char *argv[]) {
     int dimension, n;
@@ -422,7 +461,7 @@ int main(int argc, char *argv[]) {
     char *file_name, *goal;
     double **data_points, **result;
     if (argc != 3){
-        printf("Invalid Input!");
+        printf("Invalid Input!\n");
         exit(1);
     }
     goal = argv[1];
@@ -456,6 +495,6 @@ int main(int argc, char *argv[]) {
         free_mat(result, n + 1);
         return 0;
     }
-    else printf("Invalid_Input!");
+    else printf("Invalid_Input!\n");
     return 0;
 }
