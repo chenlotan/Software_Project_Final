@@ -13,7 +13,7 @@ void print_matrix(double **matrix, int rows, int cols){
             if (j != cols - 1) {
                 printf("%0.4f,", matrix[i][j]);
             } else {
-                printf("%0.4f ", matrix[i][j]);
+                printf("%0.4f", matrix[i][j]);
             }
         }
         printf("\n");
@@ -421,7 +421,7 @@ double **read_file(char fileName[], int n, int dimension) {
 
 
 int main(int argc, char *argv[]) {
-    int dimension, n, i;
+    int dimension, n;
     int *shape;
     char *file_name, *goal;
     double **data_points, **result;

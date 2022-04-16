@@ -79,7 +79,7 @@ n = vectors.shape[0]
 dimension = vectors.shape[1]
 validate((k < n) & (k != 1))
 result = mykmeanssp.spk_ext(k, goal, n, dimension, vectors.to_numpy().tolist())
-
+print_matrix(result)
 if goal == 1:
     if k == 0:
         k = len(result[0])
