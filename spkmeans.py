@@ -1,18 +1,3 @@
-# Todo
-# 1. choose function by cases according to the argument
-# the module should support calling the functions:
-#   1.full spkmeans,
-#   2.calculate weighted matrix,
-#   3.calculate diagonal degree matrix,
-#   4.normalized graph laplacian,
-#   5.eigenvalues and eigenvectors (jacoby).
-#   6.heuristic - to calculate k
-# 2. write function to spkmeans - that runs all levels and gives final output
-# 3. write C-API module code
-# notes:
-# as written in the forum (https://moodle.tau.ac.il/mod/forum/discuss.php?d=64372):
-#   epsilon value should be 0
-#   max iter should be 300
 
 import numpy as np
 import pandas as pd
@@ -79,7 +64,8 @@ n = vectors.shape[0]
 dimension = vectors.shape[1]
 validate((k < n) & (k != 1))
 result = mykmeanssp.spk_ext(k, goal, n, dimension, vectors.to_numpy().tolist())
-print_matrix(result)
+
+
 if goal == 1:
     if k == 0:
         k = len(result[0])
