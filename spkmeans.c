@@ -350,78 +350,138 @@ int check_allocation_2d_array(double **p){
 
 /**--------------------------------------functions for running code from c file--------------------------------------------**/
 
-int find_dimension(char line[]) {
-    int i = 0;
-    char *ptr = strtok(line, ",");
-    while (ptr != NULL) {
-        ptr = strtok(NULL, ",");
-        i++;
-    }
-    return i;
-}
+// int find_dimension(char line[]) {
+//     int i = 0;
+//     char *ptr = strtok(line, ",");
+//     while (ptr != NULL) {
+//         ptr = strtok(NULL, ",");
+//         i++;
+//     }
+//     return i;
+// }
 
 /**read input file and find n and dimension**/
-int *find_shape(char *fileName){
-    FILE *file = fopen(fileName, "r");
-    char buff[1024];
-    int ch, n = 0;
-    int *res = (int *)calloc(2,sizeof(int));
+// int *find_shape(char *fileName){
+//     FILE *file = fopen(fileName, "r");
+//     char buff[1024];
+//     int ch, n = 0;
+//     int *res = (int *)calloc(2,sizeof(int));
+//     check_allocation_int_array(res);
+//     if (file){
+//         ch = fscanf(file, "%s", buff);
+//         while((ch != '\n') && (ch != EOF)){
+//             if (n == 0){
+//                 res[1] = find_dimension(buff);
+//             }
+//             n++;
+//             ch = fscanf(file, "%s", buff);
+//         }
+//         fclose(file);
+//         res[0] = n;
+//         return res;
+//     }
+//     else {
+//         printf("Invalid Input!\n");
+//         exit(1);
+//     }
+//     return res;
+// }
+
+/**read file and create vectors list**/
+// double **read_file(char fileName[], int n, int dimension) {
+//     FILE *file = fopen(fileName, "r");
+//     char buff[1024], *ptr;
+//     int ch, i = 0;
+//     double *vector, *place;
+//     double **all_vectors;
+//     if (file) {
+//         all_vectors = (double **) malloc(n * sizeof(double *));
+//         check_allocation_2d_array(all_vectors);
+//         ch = fscanf(file, "%s", buff);
+//         while ((ch != '\n') && (ch != EOF)) {
+//             vector = (double *) (malloc(dimension * sizeof(double)));
+//             check_allocation_double_array(vector);
+//             place = vector;
+//             ptr = strtok(buff, ",");
+//             while (ptr != NULL) {
+//                 *(vector) = strtod(ptr, NULL);
+//                 ptr = strtok(NULL, ",");
+//                 vector++;
+//             }
+//             all_vectors[i] = place;
+//             i++;
+//             ch = fscanf(file, "%s", buff);
+//         }
+//         fclose(file);
+//         return all_vectors;
+//     } else {
+//         printf("Invalid Input!\n");
+//         exit(1);
+//     }
+
+// }
+int *find_shape(FILE *file) {
+    int dim = 1, num_of_points = 1;
+    char letter = '0';
+    int *res = (int *) calloc(2, sizeof(int));
     check_allocation_int_array(res);
-    if (file){
-        ch = fscanf(file, "%s", buff);
-        while((ch != '\n') && (ch != EOF)){
-            if (n == 0){
-                res[1] = find_dimension(buff);
-            }
-            n++;
-            ch = fscanf(file, "%s", buff);
+
+    rewind(file);
+    while (letter != '\n'){
+        letter = fgetc(file);
+        if(letter == ','){
+            dim++;
         }
-        fclose(file);
-        res[0] = n;
-        return res;
     }
-    else {
-        printf("Invalid Input!\n");
-        exit(1);
-    }
+    do {
+        letter = fgetc(file);
+        if (letter == '\n'){
+            num_of_points++;
+        }
+    } while (letter != EOF);
+    res[1] = dim;
+    res[0] = num_of_points;
     return res;
 }
 
-/**read file and create vectors list**/
-double **read_file(char fileName[], int n, int dimension) {
-    FILE *file = fopen(fileName, "r");
-    char buff[1024], *ptr;
-    int ch, i = 0;
-    double *vector, *place;
-    double **all_vectors;
-    if (file) {
-        all_vectors = (double **) malloc(n * sizeof(double *));
-        check_allocation_2d_array(all_vectors);
-        ch = fscanf(file, "%s", buff);
-        while ((ch != '\n') && (ch != EOF)) {
-            vector = (double *) (malloc(dimension * sizeof(double)));
-            check_allocation_double_array(vector);
-            place = vector;
-            ptr = strtok(buff, ",");
-            while (ptr != NULL) {
-                *(vector) = strtod(ptr, NULL);
-                ptr = strtok(NULL, ",");
-                vector++;
-            }
-            all_vectors[i] = place;
-            i++;
-            ch = fscanf(file, "%s", buff);
-        }
-        fclose(file);
-        return all_vectors;
-    } else {
-        printf("Invalid Input!\n");
-        exit(1);
+double* write_line_in_vec(int dimension, char* curr, double* vector){
+    char* curr_comma;
+    int i;
+    for ( i = 0; i<dimension -1; i++){
+        curr_comma = strchr((char*)curr,',');
+        *curr_comma = '\0';
+        vector[i] = atof(curr);
+        curr = ++curr_comma;
     }
+    vector[dimension-1] = atof(curr);
+    return vector;
+}
+/**read file and create vectors list**/
+double **read_file(FILE file[], int n, int dimension) {
+    int place;
+    char *curr, *line;
+    double* vector;
+    double** all_vectors = (double**)calloc(n , sizeof(double*));
+    rewind(file);
+    line = (char*)calloc(100000,sizeof(char));
+    if (line == NULL){
+        printf("An Error Has Occurred");
+        return NULL;
+    }
+    for(place =0 ; place < n; place++){
+        curr = line;
+        if(fscanf(file, "%s",line) == EOF){
+            printf("An Error Has Occurred");
+            return NULL;
+        }
+        vector = (double*) calloc(dimension,sizeof(double));
+        check_allocation_double_array(vector);
+        all_vectors[place] = write_line_in_vec(dimension,curr,vector);
+    }
+    free(line);
+    return all_vectors;
 
 }
-
-
 
 int main(int argc, char *argv[]) {
     int dimension, n;
@@ -434,11 +494,16 @@ int main(int argc, char *argv[]) {
     }
     goal = argv[1];
     file_name = argv[2];
-    shape = find_shape(file_name);
+    FILE *file = fopen(file_name, "r");
+    if (file == NULL) {
+        printf("Invalid Input!\n");
+        exit(1);
+    }
+    shape = find_shape(file);
     n = shape[0];
     dimension = shape[1];
     free(shape);
-    data_points = read_file(file_name, n, dimension);
+    data_points = read_file(file, n, dimension);
     if (strcmp(goal, "wam") == 0) {
         result = weight_matrix(data_points, n, dimension);
         print_matrix(result, n, n);
