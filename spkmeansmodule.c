@@ -84,6 +84,8 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
             }
             sorted_eigenMat = transpose(transposed_eigenMat, n, n+1);
             result = create_T_matrix(sorted_eigenMat, k, n);
+//            print_matrix(eigen_mat, n+1, n);
+//            print_matrix(result, n, k);
             result_py = transform_2dArray_to_PyObject(result, n ,k);
             free_memory(data_points,n);
             free(eigen_vals);

@@ -224,7 +224,7 @@ double **jacobi_algo(double **A, int n) {
     for (j = 0; j < n + 1; ++j) {
         for (m = 0; m < n; ++m) {
             if (j == 0) {
-                if (-0.00001 < A[m][m] && A[m][m] < 0){
+                if (-0.0001 < A[m][m] && A[m][m] < 0){
                     result[j][m] = -A[m][m];
                 }
                 else {
@@ -367,7 +367,7 @@ int *find_shape(char *fileName){
     check_allocation_int_array(res);
     if (file){
         ch = fscanf(file, "%s", buff);
-        while((ch != 'n') && (ch != EOF)){
+        while((ch != '\n') && (ch != EOF)){
             if (n == 0){
                 res[1] = find_dimension(buff);
             }
@@ -382,6 +382,7 @@ int *find_shape(char *fileName){
         printf("Invalid Input!\n");
         exit(1);
     }
+    return n;
 }
 
 /**read file and create vectors list**/
@@ -440,24 +441,28 @@ int main(int argc, char *argv[]) {
         result = weight_matrix(data_points, n, dimension);
         print_matrix(result, n, n);
         free_mat(result, n);
+        free_mat(data_points, n);
         return 0;
     }
     if (strcmp(goal, "ddg") == 0) {
         result = diagonal_d_matrix(data_points, n, dimension);
         print_matrix(result, n, n);
         free_mat(result, n);
+        free_mat(data_points, n);
         return 0;
     }
     if (strcmp(goal, "lnorm") == 0) {
         result = laplacian_Lnorm(data_points, n, dimension);
         print_matrix(result, n, n);
         free_mat(result, n);
+        free_mat(data_points, n);
         return 0;
     }
     if (strcmp(goal, "jacobi") == 0) {
         result = jacobi_algo(data_points, n);
         print_matrix(result, n + 1, n);
         free_mat(result, n + 1);
+        free_mat(data_points, n);
         return 0;
     }
     else printf("Invalid_Input!\n");
