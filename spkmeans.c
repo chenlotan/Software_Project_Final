@@ -131,7 +131,7 @@ double **laplacian_Lnorm(double **data_points, int n, int dimension) {
     for (i = 0; i < n; ++i) {
         Lnorm_mat[i][i] = 1 - (w_mat[i][i] / diag_mat[i][i]);
         for (j = i + 1; j < n; ++j) {
-            Lnorm_mat[i][j] = - w_mat[i][j] / pow(diag_mat[i][i] * diag_mat[j][j], 0.5);
+            Lnorm_mat[i][j] = - w_mat[i][j] / sqrt(diag_mat[i][i] * diag_mat[j][j]);
             Lnorm_mat[j][i] = Lnorm_mat[i][j];
         }
     }
