@@ -382,7 +382,7 @@ int *find_shape(char *fileName){
         printf("Invalid Input!\n");
         exit(1);
     }
-    return n;
+    return res;
 }
 
 /**read file and create vectors list**/
