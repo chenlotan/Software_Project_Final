@@ -488,13 +488,14 @@ int main(int argc, char *argv[]) {
     int *shape;
     char *file_name, *goal;
     double **data_points, **result;
+    FILE *file;
     if (argc != 3){
         printf("Invalid Input!\n");
         exit(1);
     }
     goal = argv[1];
     file_name = argv[2];
-    FILE *file = fopen(file_name, "r");
+    file = fopen(file_name, "r");
     if (file == NULL) {
         printf("Invalid Input!\n");
         exit(1);
