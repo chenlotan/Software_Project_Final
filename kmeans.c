@@ -31,7 +31,7 @@ int calc_argmin(double *mu[], double *vector, int k, int dimension) {
 
     for (i = 0; i < k; ++i) {
         sum_p = compute_distance(mu[i], vector, dimension);
-        if (sum_p < min_val - 0.000001) {
+        if (sum_p < min_val - 0.0001) {
             min_val = sum_p;
             min_mu = i;
             /*printf("i = %d, minVal = %f , sump = %f \n", i, min_val, sum_p);*/
