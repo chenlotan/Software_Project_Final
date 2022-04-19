@@ -136,6 +136,7 @@ double **laplacian_Lnorm(double **data_points, int n, int dimension) {
             Lnorm_mat[j][i] = Lnorm_mat[i][j];
         }
     }
+    free_mat(w_mat, n);
     free_mat(diag_mat, n);
     return Lnorm_mat;
 }
@@ -237,6 +238,7 @@ double **jacobi_algo(double **A, int n) {
     }
     free_mat(P, n);
     free_mat(V, n);
+    free_mat(new_A, n);
     return result;
 }
 
