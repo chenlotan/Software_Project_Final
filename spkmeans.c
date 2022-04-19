@@ -116,6 +116,7 @@ double **diagonal_d_matrix(double **data_points, int n, int dimension) {
         }
         diag_mat[i][i] = sum;
     }
+    free_mat(w_mat, n);
     return diag_mat;
 }
 
@@ -136,7 +137,6 @@ double **laplacian_Lnorm(double **data_points, int n, int dimension) {
         }
     }
     free_mat(diag_mat, n);
-    free_mat(w_mat, n);
     return Lnorm_mat;
 }
 
