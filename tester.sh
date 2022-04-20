@@ -248,7 +248,7 @@ save_dataset(m, "jacobi_input_10_6")' | python3
 		buffer
 	fi
 	
-	rm jacobi_input.csv &> /dev/null
+	rm jacobi_input_10_6.csv &> /dev/null
 	rm 1000_blobs_10_feat.csv &> /dev/null
 }
 
@@ -278,18 +278,18 @@ function test_efficiency_goal() {
 	if [[ $1 == "c" ]]; then
 	
 		if [[ $2 == "jacobi" ]]; then
-			time_result=$(timeout 10 bash -c "time ./spkmeans jacobi jacobi_input_10_6.csv 1> /dev/null" 2>&1) 
+			time_result=$(timeout 11.5 bash -c "time ./spkmeans jacobi jacobi_input_10_6.csv 1> /dev/null" 2>&1) 
 		else
-			time_result=$(timeout 0.6 bash -c "time ./spkmeans ${2} 1000_blobs_10_feat.csv 1> /dev/null" 2>&1) 
+			time_result=$(timeout 0.65 bash -c "time ./spkmeans ${2} 1000_blobs_10_feat.csv 1> /dev/null" 2>&1) 
 		fi
 	
 	else
 		if [[ $2 == "jacobi" ]]; then
-			time_result=$(timeout 3.5 bash -c "time python3 spkmeans.py 0 jacobi jacobi_input_10_6.csv 1> /dev/null" 2>&1) 
+			time_result=$(timeout 8 bash -c "time python3 spkmeans.py 0 jacobi jacobi_input_10_6.csv 1> /dev/null" 2>&1) 
 		elif [[ $2 == "spk" ]]; then
-			time_result=$(timeout 65 bash -c "time python3 spkmeans.py 0 spk 1000_blobs_10_feat.csv 1> /dev/null" 2>&1) 
+			time_result=$(timeout 130 bash -c "time python3 spkmeans.py 0 spk 1000_blobs_10_feat.csv 1> /dev/null" 2>&1) 
 		else
-			time_result=$(timeout 1.5 bash -c "time python3 spkmeans.py 0 ${2} 1000_blobs_10_feat.csv 1> /dev/null" 2>&1) 
+			time_result=$(timeout 4.5 bash -c "time python3 spkmeans.py 0 ${2} 1000_blobs_10_feat.csv 1> /dev/null" 2>&1) 
 		fi
 	fi
 	
@@ -303,17 +303,17 @@ function test_efficiency_goal() {
 		
 		if [[ $1 == "c" ]]; then
 			if [[ $2 == "jacobi" ]]; then
-				echo -ne "10" >> $results_dir/efficiency_transcript_$1.txt
+				echo -ne "11.5" >> $results_dir/efficiency_transcript_$1.txt
 			else
-				echo -ne "0.6" >> $results_dir/efficiency_transcript_$1.txt
+				echo -ne "0.65" >> $results_dir/efficiency_transcript_$1.txt
 			fi
 		else
 			if [[ $2 == "jacobi" ]]; then
-				echo -ne "3.5" >> $results_dir/efficiency_transcript_$1.txt
+				echo -ne "8" >> $results_dir/efficiency_transcript_$1.txt
 			elif [[ $2 == "spk" ]]; then
-				echo -ne "65" >> $results_dir/efficiency_transcript_$1.txt
+				echo -ne "130" >> $results_dir/efficiency_transcript_$1.txt
 			else
-				echo -ne "1.5" >> $results_dir/efficiency_transcript_$1.txt
+				echo -ne "4.5" >> $results_dir/efficiency_transcript_$1.txt
 			fi
 		fi
 		
@@ -387,13 +387,12 @@ function instructions() {
 (3) Detailed memory leak tests' results are saved into \`\033[4;37mmemory_transcript_c.txt\e[0m\`.
 (4) Detailed Efficiency tests' results are saved into \`\033[4;37mefficiency_transcript_<interface>.txt\e[0m\`.
 (5) Only failed tests' results are saved into their transcript.
+(6) Efficiency tests become invalid when running on tau-related server (e.g., nova).
 
 \e[4;37m\e[1;37mInstructions\e[0m:
 (1) Avoid any build/dist/egg directories/files from the working directory. Could potentially lead to undefined behaviors of the test script.
-(2) You shall run this script under \`sudo\` privileges (Required for \`setup.py\`).
-(3) You shall place this shell script within the directory that contains all of the files that you need to assign.
-(4) You shall install or have installed the package \`\e[4;37mvalgrind\e[0m\` if you wish to have memory leak tests.
-(5) When running from any tau-related servers, note that the efficiency tests become invalid, and that you need to remove the \`sudo\` at line 341 in the script"
+(2) You shall run this shell script from within the directory that contains all of the files that you need to assign.
+(3) You shall install or have installed the package \`\e[4;37mvalgrind\e[0m\` if you wish to have memory leak tests."
 	exit
 }
 
