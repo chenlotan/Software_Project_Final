@@ -190,7 +190,7 @@ function verdict_memory_loss() {
 	if [[ ${bytes_lost//,} -eq 0 ]]; then
 		echo -ne '\033[1;32mNO MEMORY LEAK\e[0m' # print out a 'success' message
 	else
-		echo -e "\e[1;31mMEMORY LEAK\e[0m" # print out a 'failed' message
+		echo -ne "\e[1;31mMEMORY LEAK\e[0m" # print out a 'failed' message
 	fi
 }
 
@@ -203,7 +203,7 @@ function verdict_memory_loss() {
 # =================
 function efficiency_test() {
 	# test message
-	echo -e "\e[4;37mTesting the \e[4;33m\e[1;33mefficiency of the algorithms\e[0m.\n\e[1;31mNOTICE: This test is going to take quite a while.\nMoreoever, this test is subjective.\nAlbeit, don't be a bozo and do optimize your code - you might get a penalty for inefficient code.\e[0m"
+	echo -e "\e[4;37mTesting the \e[4;33m\e[1;33mefficiency of the algorithms\e[0m.\n\e[1;31mNOTICE: This test is going to take quite a while.\nMoreover, this test is subjective.\nAlbeit, don't be a bozo and do optimize your code - you might get a penalty for inefficient code.\e[0m"
 	
 	# creating a maximized file
 	echo -e 'from sklearn import datasets
@@ -392,7 +392,8 @@ function instructions() {
 \e[4;37m\e[1;37mInstructions\e[0m:
 (1) Avoid any build/dist/egg directories/files from the working directory. Could potentially lead to undefined behaviors of the test script.
 (2) You shall run this shell script from within the directory that contains all of the files that you need to assign.
-(3) You shall install or have installed the package \`\e[4;37mvalgrind\e[0m\` if you wish to have memory leak tests."
+(3) You shall have the package \`\e[4;37mvalgrind\e[0m\` installed if you wish to run memory leak tests.
+(4) You shall have the python packages \`\e[4;37mnumpy\e[0m\` and \`\e[4;37mscikit-learn\e[0m\` installed if you wish to run efficiency tests."
 	exit
 }
 
