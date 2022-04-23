@@ -278,7 +278,7 @@ int compare_vec(const void *v1, const void *v2){
     if (vec1[0]>vec2[0]){
         return 1;
     }
-    if (vec1[0]<vec2[0]){
+    if (vec1[0] < vec2[0]){
         return -1;
     }
     return 0;
@@ -302,8 +302,7 @@ double *get_eigenVals(double **matrix, int n){
 }
 
 
-/**create T matrix - vectors of k min eigenvalues normalized
- * in case of row of zeros - the row will stay the same**/
+/** create T matrix - vectors of k min eigenvalues normalized **/
 double **create_T_matrix(double **matrix, int k, int n){
     int i, j;
     double sum_row;
@@ -326,7 +325,7 @@ double **create_T_matrix(double **matrix, int k, int n){
 
 int check_allocation_double_array(double *p) {
     if (p == NULL) {
-        printf("An Error Has Occurred\n");
+        printf("An Error Has Occurred");
         exit(1);
     }
     return 0;
@@ -334,7 +333,7 @@ int check_allocation_double_array(double *p) {
 
 int check_allocation_int_array(int *p) {
     if (p == NULL) {
-        printf("An Error Has Occurred\n");
+        printf("An Error Has Occurred");
         exit(1);
     }
     return 0;
@@ -342,7 +341,7 @@ int check_allocation_int_array(int *p) {
 
 int check_allocation_2d_array(double **p){
     if (p == NULL) {
-        printf("An Error Has Occurred\n");
+        printf("An Error Has Occurred");
         exit(1);
     }
     return 0;
@@ -419,14 +418,14 @@ int main(int argc, char *argv[]) {
     double **data_points, **result;
     FILE *file;
     if (argc != 3){
-        printf("Invalid Input!\n");
+        printf("Invalid Input!");
         exit(1);
     }
     goal = argv[1];
     file_name = argv[2];
     file = fopen(file_name, "r");
     if (file == NULL) {
-        printf("Invalid Input!\n");
+        printf("Invalid Input!");
         exit(1);
     }
     shape = find_shape(file);
@@ -462,6 +461,6 @@ int main(int argc, char *argv[]) {
         free_mat(data_points, n);
         return 0;
     }
-    else printf("Invalid_Input!\n");
+    else printf("Invalid_Input!");
     return 0;
 }

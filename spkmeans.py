@@ -50,6 +50,8 @@ def print_matrix(matrix):
                 print(str("{0:.4f}".format(matrix[i][j])))
 
 
+EPSILON = 0
+MAX_ITER = 300
 goals = {"spk": 1, "wam": 2, "ddg": 3, "lnorm": 4, "jacobi": 5}
 args = sys.argv[1:]
 validate(len(args) == 3)
@@ -57,20 +59,17 @@ k, goal, input_filename = args[0], args[1], args[2]
 validate(args[0].isdigit())
 k = int(k)
 goal = goals[goal]
-epsilon = 0
-max_iter = 300
 vectors = read_file_to_df(input_filename)
 n = vectors.shape[0]
 dimension = vectors.shape[1]
-validate((k < n) & (k != 1))
+validate((0 <= k < n) & (k != 1))
 result = mykmeanssp.spk_ext(k, goal, n, dimension, vectors.to_numpy().tolist())
-
 
 if goal == 1:
     if k == 0:
         k = len(result[0])
     centroids_index, centroids = initialize_centroids(result, k)
-    final_centroids = mykmeanssp.fit(k, k, n, max_iter, epsilon, centroids.tolist(), result)
+    final_centroids = mykmeanssp.fit(k, k, n, MAX_ITER, EPSILON, centroids.tolist(), result)
     for i in range(len(centroids_index)):
         if i < len(centroids_index) - 1:
             print(str(centroids_index[i]) + ",", end="")

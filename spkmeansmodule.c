@@ -35,7 +35,7 @@ static PyObject *fit(PyObject *self, PyObject *args) {
         return NULL;
     }
     if (!(PyList_Check(centroids_copy)) || !(PyList_Check(data_points_copy))) {
-        printf("Error in Types of Arguments\n");
+        printf("An Error Has Occurred");
     }
     final_centroids = initialize_2d_double_array(final_centroids, k, dimension);
     centroids = transform_PyObject_to_2dArray(centroids_copy, k, dimension);
@@ -78,14 +78,12 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
             if (k==0){
                 k = eigengap_heuristic(eigen_vals, n);
                 if (k==1){
-                    printf("An Error Has Occurred\n");
+                    printf("An Error Has Occurred");
                     exit(1);
                 }
             }
             sorted_eigenMat = transpose(transposed_eigenMat, n, n+1);
             result = create_T_matrix(sorted_eigenMat, k, n);
-//            print_matrix(eigen_mat, n+1, n);
-//            print_matrix(result, n, k);
             result_py = transform_2dArray_to_PyObject(result, n ,k);
             free_memory(data_points,n);
             free(eigen_vals);
@@ -119,7 +117,7 @@ static PyObject *spk_ext(PyObject *self, PyObject *args) {
             free_memory(data_points,n);
             break;
         default:
-            printf("Invalid Input!\n");
+            printf("Invalid Input!");
             exit(1);
     }
 
